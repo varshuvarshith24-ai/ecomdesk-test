@@ -2496,10 +2496,9 @@ window.SAProfitOpts = { fixed: 0, get: function () { return { unusable: false, c
   var msg = el("p", "msg", ""); msg.setAttribute("role", "status");
   function wipe() {
     msg.className = "msg"; msg.textContent = "Deleting …";
-    try { if (window.SALocal && window.SALocal.close) window.SALocal.close(); } catch (e) {}
-    var done = false;
+    var finished = false;
     function finish() {
-      if (done) return; done = true;
+      if (finished) return; finished = true;
       try { localStorage.clear(); } catch (e) {}
       try { sessionStorage.clear(); } catch (e) {}
       var jobs = [];
@@ -2507,11 +2506,14 @@ window.SAProfitOpts = { fixed: 0, get: function () { return { unusable: false, c
       try { if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) jobs.push(navigator.serviceWorker.getRegistrations().then(function (r) { return Promise.all(r.map(function (x) { return x.unregister(); })); })); } catch (e) {}
       Promise.all(jobs).catch(function () {}).then(function () { try { localStorage.clear(); } catch (e) {} location.reload(); });
     }
-    try {
-      var rq = indexedDB.deleteDatabase("seller_labels");
-      rq.onsuccess = finish; rq.onerror = finish; rq.onblocked = function () { setTimeout(finish, 800); };
-      setTimeout(finish, 4000);
-    } catch (e) { finish(); }
+    var clear = window.SALocal && window.SALocal.wipe ? window.SALocal.wipe() : Promise.resolve();
+    clear.then(function () {
+      try {
+        var rq = indexedDB.deleteDatabase("seller_labels");
+        rq.onsuccess = finish; rq.onerror = finish; rq.onblocked = function () { setTimeout(finish, 800); };
+        setTimeout(finish, 3000);
+      } catch (e) { finish(); }
+    }).catch(function (e) { msg.className = "msg bad"; msg.textContent = "Could not delete everything: " + ((e && e.message) || e) + " Try again."; });
   }
   btn.addEventListener("click", function () {
     var L = window.SALock;
@@ -3542,7 +3544,18 @@ window.SAProfitOpts = { fixed: 0, get: function () { return { unusable: false, c
       return open().then(function () { return A[action](extra || {}); });
     },
     exportAll: exportAll, importAll: importAll, counts: counts, markBackup: function () { return kvSet("lastBackup", { at: Date.now() }); },
-    stateOf: stateOf, isoDate: isoDate
+    stateOf: stateOf, isoDate: isoDate,
+    // factory reset: empty every store first (this always works), then try to remove the database itself
+    wipe: function () {
+      return open().then(function () {
+        return new Promise(function (res, rej) {
+          var t = db.transaction(["orders", "frauds", "kv"], "readwrite");
+          t.objectStore("orders").clear(); t.objectStore("frauds").clear(); t.objectStore("kv").clear();
+          t.oncomplete = function () { res(); };
+          t.onerror = t.onabort = function () { rej(t.error || new Error("Could not clear the data.")); };
+        });
+      }).then(function () { ordersP = null; try { db.close(); } catch (e) {} db = null; });
+    }
   };
   try { if (root.navigator && root.navigator.storage && root.navigator.storage.persist) root.navigator.storage.persist(); } catch (e) {}
 })(window);
