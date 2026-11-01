@@ -2314,13 +2314,14 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
       <div class="field"><label for="pf-month">Payment month</label><select id="pf-month"></select></div>
       <div class="field"><label for="pf-pack">Packing cost per packet (₹)</label><input id="pf-pack" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 5"></div>
       <p class="help" id="pf-pack-note"></p>
+      <div class="field"><label for="pf-fixed">Other expenses this month (₹, optional)</label><input id="pf-fixed" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. rent, salary. Leave empty for none"></div>
       <div id="pf-month-note" class="stack" style="gap:8px"></div>
     </section>
     <section class="card" id="pf-s3" hidden>
       <h2>Cost price per SKU</h2>
-      <p class="help">Unit cost including GST, one price for each category of your SKU list (Settings, Manage SKUs). Every SKU in the category gets that price. A SKU that is not in your list is asked on its own. Prices from your last saved month are filled in, so check them. An order of quantity 2 costs 2 × the unit price.</p>
+      <p class="help">Unit cost including GST, one price for each SKU. Prices from your last saved month are filled in, so check them. An order of quantity 2 costs 2 × the unit price.</p>
       <details><summary>Paste a price list instead</summary>
-        <div class="stack" style="gap:8px"><p class="help">One per line, price at the end. Use a category name or a SKU, for example Category A 400 or SKU_A 400</p>
+        <div class="stack" style="gap:8px"><p class="help">One per line, price at the end. Use the SKU, for example SKU_A 400</p>
         <textarea id="pf-paste" spellcheck="false" placeholder="SKU_A 400&#10;SKU_B 200"></textarea>
         <button class="btn ghost sm" id="pf-apply" type="button">Apply list</button></div>
       </details>
@@ -2338,8 +2339,8 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
       <p class="msg" id="pf-save-msg" role="status"></p>
       <h3>By type of line</h3>
       <div class="tablewrap"><table id="pf-types"><thead><tr><th>Type</th><th class="n">Lines</th><th class="n">Settlement</th><th class="n">Profit</th></tr></thead><tbody></tbody></table></div>
-      <h3>Profit by category</h3>
-      <div class="tablewrap"><table id="pf-cats"><thead><tr><th>Category</th><th class="n">Units</th><th class="n">Settlement</th><th class="n">Profit</th><th class="n">Profit %</th><th class="n">Per unit</th></tr></thead><tbody></tbody></table></div>
+      <h3>Profit by SKU</h3>
+      <div class="tablewrap"><table id="pf-cats"><thead><tr><th>SKU</th><th class="n">Units</th><th class="n">Settlement</th><th class="n">Profit</th><th class="n">Profit %</th><th class="n">Per unit</th></tr></thead><tbody></tbody></table></div>
       <p class="help" id="pf-cats-note"></p>
       <details><summary>By SKU</summary>
         <div class="tablewrap"><table id="pf-bysku"><thead><tr><th>SKU</th><th class="n">Units</th><th class="n">Settlement</th><th class="n">Profit</th></tr></thead><tbody></tbody></table></div>
@@ -2351,7 +2352,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
       <h2 id="h-pfh">Saved months</h2>
       <p class="help" id="pf-hist-msg"></p>
       <p class="help" id="pf-hist-empty">No month saved yet. Your first calculation will appear here.</p>
-      <div class="tablewrap" id="pf-hist-wrap" hidden><table id="pf-hist"><thead><tr><th>Month</th><th class="n">Profit</th><th class="n">Profit %</th><th class="n">Settlement</th><th>Best category</th></tr></thead><tbody></tbody></table></div>
+      <div class="tablewrap" id="pf-hist-wrap" hidden><table id="pf-hist"><thead><tr><th>Month</th><th class="n">Profit</th><th class="n">Profit %</th><th class="n">Settlement</th><th>Best SKU</th></tr></thead><tbody></tbody></table></div>
     </section>
     <section class="card" aria-labelledby="h-pfc" id="pf-cmp-card" hidden>
       <h2 id="h-pfc">Orders by month</h2>
@@ -2362,7 +2363,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
       <details><summary>How profit is calculated</summary>
         <div class="stack" style="gap:8px"><p class="help">Cash basis: every line in Meesho's Order Payments sheet whose Payment Date is in the month. Cost = unit cost × quantity.</p>
         <div class="tablewrap"><table id="pf-rules"><thead><tr><th>Line</th><th>Profit</th></tr></thead><tbody></tbody></table></div>
-        <p class="help">Monthly profit = sum of line profits − ads cost (Ads Cost sheet, including GST, deducted once). GST payable, TCS/TDS credits and fixed expenses are not included.</p></div>
+        <p class="help">Monthly profit = sum of line profits − ads cost (Ads Cost sheet, including GST, deducted once). GST payable and TCS/TDS credits are not included. Other expenses you type on this page are deducted once.</p></div>
       </details>
     </section>
   </div>
@@ -2400,7 +2401,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
   <section class="card" id="ver-card"></section>
   <section class="card" aria-labelledby="h-sku">
     <h2 id="h-sku">SKU list</h2>
-    <p class="help">Add or edit your categories and SKUs, and choose the order used in the pick list and the PDFs.</p>
+    <p class="help">Your SKUs are read from your labels. Move them up or down to set the order of the PDFs and the WhatsApp list.</p>
     <button class="btn" id="open-skus" type="button">Manage SKUs</button>
   </section>
   <section class="card" aria-labelledby="h-set" hidden>
@@ -2463,7 +2464,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
     var o = document.createElement("div"); o.id = "sa-setup";
     var b = document.createElement("div"); b.className = "box";
     var h = document.createElement("h1"); h.textContent = "Welcome";
-    var p = document.createElement("p"); p.className = "help"; p.textContent = "Set up your shop. This stays on this phone, and you can change it later in Settings. Your SKUs and categories are added in Settings, Manage SKUs.";
+    var p = document.createElement("p"); p.className = "help"; p.textContent = "Set up your shop. This stays on this phone, and you can change it later in Settings. Your SKUs are added by themselves when you upload labels.";
     b.appendChild(h); b.appendChild(p);
     b.appendChild(form(function () { o.remove(); }, "Start"));
     o.appendChild(b); document.body.appendChild(o);
@@ -2480,35 +2481,49 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
 })();
 </script>
 <script>
-// Profit rules (Settings): how returns, claims, ads and other expenses are treated. Saved on this phone.
+// Fixed profit rules: returned stock is resold, ads are deducted, claims are ignored. Other expenses are typed on the Profit page.
+window.SAProfitOpts = { fixed: 0, get: function () { return { unusable: false, claims: "ignore", ads: true, fixed: window.SAProfitOpts.fixed || 0 }; } };
+</script>
+<script>
+// Factory reset (Settings): deletes everything this app stored on the phone.
 (function () {
-  var K = "sa_profit_opts";
-  function load() { try { var o = JSON.parse(localStorage.getItem(K) || "null") || {}; return { unusable: !!o.unusable, claims: o.claims === "count" ? "count" : "ignore", ads: o.ads !== false, fixed: Math.max(0, parseFloat(o.fixed) || 0) }; } catch (e) { return { unusable: false, claims: "ignore", ads: true, fixed: 0 }; } }
-  window.SAProfitOpts = { get: load };
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
-  function field(label, node) { var w = el("div", "field"); w.appendChild(el("label", "", label)); w.appendChild(node); return w; }
-  function select(opts, val) { var s = document.createElement("select"); opts.forEach(function (o) { var x = el("option", "", o[1]); x.value = o[0]; if (o[0] === val) x.selected = true; s.appendChild(x); }); return s; }
   var host = document.getElementById("sheet-settings"); if (!host) return;
-  var o = load(), sec = el("section", "card"); sec.id = "sa-profit-rules";
-  sec.appendChild(el("h2", "", "Profit rules"));
-  sec.appendChild(el("p", "help", "How the Profit page works out your profit. The standard choices suit most sellers. A change applies to months you calculate from now on; months already saved stay as they were."));
-  var ret = select([["usable", "The stock comes back and can be sold again"], ["lost", "The stock is lost: count its cost"]], o.unusable ? "lost" : "usable");
-  var clm = select([["ignore", "Ignore them (neither profit nor loss)"], ["count", "Count them as income"]], o.claims);
-  var ads = select([["yes", "Deduct the ads cost from the Meesho file"], ["no", "Do not deduct ads cost"]], o.ads ? "yes" : "no");
-  var fix = document.createElement("input"); fix.type = "text"; fix.inputMode = "decimal"; fix.autocomplete = "off"; fix.value = o.fixed ? String(o.fixed) : ""; fix.placeholder = "0";
-  sec.appendChild(field("Returned and RTO parcels", ret));
-  sec.appendChild(field("Claims paid by Meesho for returned parcels", clm));
-  sec.appendChild(field("Ads cost", ads));
-  sec.appendChild(field("Other monthly expenses in Rs (rent, salary and so on), deducted once a month", fix));
-  sec.appendChild(el("p", "help", "GST payable, TCS and TDS credits are not included: the Meesho payment file does not give exact figures for them."));
-  var save = el("button", "btn", "Save"); save.type = "button"; var msg = el("p", "msg", ""); msg.setAttribute("role", "status");
-  save.addEventListener("click", function () {
-    var f = String(fix.value).trim().replace(/,/g, ""), n = f === "" ? 0 : parseFloat(f);
-    if (!isFinite(n) || n < 0) { msg.className = "msg bad"; msg.textContent = "Other expenses must be a number, or empty."; return; }
-    try { localStorage.setItem(K, JSON.stringify({ unusable: ret.value === "lost", claims: clm.value, ads: ads.value === "yes", fixed: n })); } catch (e) {}
-    msg.className = "msg"; msg.textContent = "Saved."; window.dispatchEvent(new CustomEvent("sa:profitopts"));
+  var sec = el("section", "card"); sec.id = "sa-reset-card";
+  sec.appendChild(el("h2", "", "Factory reset"));
+  sec.appendChild(el("p", "help", "Deletes everything this app saved on this phone: orders, fraud list, SKUs, profit history, shop profile, app lock and settings. The app then starts fresh like a new install. This cannot be undone, so save a backup file first if you may need your data."));
+  var btn = el("button", "btn ghost", "Factory reset"); btn.type = "button"; btn.style.color = "#b3261e";
+  var msg = el("p", "msg", ""); msg.setAttribute("role", "status");
+  function wipe() {
+    msg.className = "msg"; msg.textContent = "Deleting …";
+    try { if (window.SALocal && window.SALocal.close) window.SALocal.close(); } catch (e) {}
+    var done = false;
+    function finish() {
+      if (done) return; done = true;
+      try { localStorage.clear(); } catch (e) {}
+      try { sessionStorage.clear(); } catch (e) {}
+      var jobs = [];
+      try { if (window.caches && caches.keys) jobs.push(caches.keys().then(function (k) { return Promise.all(k.map(function (n) { return caches.delete(n); })); })); } catch (e) {}
+      try { if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) jobs.push(navigator.serviceWorker.getRegistrations().then(function (r) { return Promise.all(r.map(function (x) { return x.unregister(); })); })); } catch (e) {}
+      Promise.all(jobs).catch(function () {}).then(function () { try { localStorage.clear(); } catch (e) {} location.reload(); });
+    }
+    try {
+      var rq = indexedDB.deleteDatabase("seller_labels");
+      rq.onsuccess = finish; rq.onerror = finish; rq.onblocked = function () { setTimeout(finish, 800); };
+      setTimeout(finish, 4000);
+    } catch (e) { finish(); }
+  }
+  btn.addEventListener("click", function () {
+    var L = window.SALock;
+    var go = L && L.enabled && L.enabled() && L.verify ? L.verify() : Promise.resolve(true);
+    go.then(function (ok) {
+      if (!ok) return;
+      if (!window.confirm("Delete ALL data in this app on this phone?\n\nOrders, fraud list, SKUs, profit history and settings will be erased. This cannot be undone.")) return;
+      if (!window.confirm("Last check: really erase everything and start fresh?")) return;
+      wipe();
+    });
   });
-  sec.appendChild(save); sec.appendChild(msg);
+  sec.appendChild(btn); sec.appendChild(msg);
   host.appendChild(sec);
 })();
 </script>
@@ -2540,22 +2555,26 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
   // Without a list the built-in size/pack rules below are used.
   var CFG = null;
   function skuKey(s) { return String(s || "").replace(/\s+/g, " ").trim().toLowerCase(); }
-  function setSkuConfig(cats) {
-    if (!cats || !cats.length) { CFG = null; return; }
-    var map = {}, catIdx = {}, skuIdx = {}, names = [];
-    cats.forEach(function (c, ci) {
-      names.push(c.name);
-      catIdx[c.name] = ci;
-      (c.skus || []).forEach(function (s, si) { var k = skuKey(s); if (k && map[k] === undefined) { map[k] = c.name; skuIdx[k] = si; } });
+  // the list is the seller's SKUs in their order (older saved lists with groups are flattened)
+  function flatSkus(cats) {
+    var out = [], seen = {};
+    (cats || []).forEach(function (c) {
+      var arr = typeof c === "string" ? [c] : ((c.skus && c.skus.length) ? c.skus : (c.name ? [c.name] : []));
+      arr.forEach(function (x) { var k = skuKey(x); if (k && !seen[k]) { seen[k] = 1; out.push(String(x).replace(/\s+/g, " ").trim()); } });
     });
-    CFG = { map: map, catIdx: catIdx, skuIdx: skuIdx, names: names };
+    return out;
   }
-  function categorize(sku, size, desc) {
-    if (CFG) return CFG.map[skuKey(sku)] || null;
-    return getCategory(sku, size, desc);
+  function setSkuConfig(cats) {
+    var list = flatSkus(cats);
+    if (!list.length) { CFG = null; return; }
+    var skuIdx = {}, map = {};
+    list.forEach(function (n, i) { skuIdx[skuKey(n)] = i; map[skuKey(n)] = n; });
+    CFG = { map: map, skuIdx: skuIdx, names: list };
   }
-  function categoryOrder() { return CFG ? CFG.names.slice() : CATEGORY_ORDER.slice(); }
-  function recategorize(rows) { rows.forEach(function (r) { r.category = categorize(r.sku, r.size, r.desc); }); }
+  // there are no categories: a label's "category" is simply its SKU
+  function categorize(sku) { return String(sku || "").replace(/\s+/g, " ").trim() || "(no SKU)"; }
+  function categoryOrder() { return CFG ? CFG.names.slice() : []; }
+  function recategorize(rows) { rows.forEach(function (r) { r.category = categorize(r.sku); }); }
 
   // No built-in rules: a SKU belongs to a category only when the seller lists it in Manage SKUs.
   function getCategory(sku, size, desc) { return null; }
@@ -2621,11 +2640,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
     };
   }
 
-  function catRank(cat) {
-    var order = CFG ? CFG.names : CATEGORY_ORDER;
-    var i = order.indexOf(cat);
-    return i >= 0 ? i : order.length;
-  }
+  function catRank(cat) { return skuRank(cat); }
   // position of a SKU inside its category (owner's order when a list is set)
   function skuRank(sku) {
     if (!CFG) return 0;
@@ -2663,10 +2678,6 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
 
   function sortForPdf(rows) {
     return rows.map(function (r, i) { return { r: r, i: i }; }).sort(function (a, b) {
-      var ra = catRank(a.r.category), rb = catRank(b.r.category);
-      if (ra !== rb) return ra - rb;
-      var ca = a.r.category || "", cb = b.r.category || "";
-      if (ca !== cb) return ca < cb ? -1 : 1;
       var ka = skuRank(a.r.sku), kb = skuRank(b.r.sku);
       if (ka !== kb) return ka - kb;
       var sa = a.r.sku.toUpperCase(), sb = b.r.sku.toUpperCase();
@@ -2687,18 +2698,9 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
       var rs = cg.map[c];
       out.push("🚚 *" + c.toUpperCase() + " – " + rs.length + "*");
       out.push("📋 SKU-wise count");
-      var bc = groupBy(rs, function (r) { return r.category || ("Other (" + r.sku + ")"); });
-      bc.order.sort(function (a, b) {
-        var d = catRank(a) - catRank(b);
-        return d || (a < b ? -1 : 1);
-      });
-      bc.order.forEach(function (cat) {
-        var items = bc.map[cat];
-        out.push("*" + cat + " – " + items.length + "*");
-        var sc = groupBy(items, function (r) { return r.sku; });
-        sc.order.sort(function (x, y) { return (skuRank(x) - skuRank(y)) || (x < y ? -1 : x > y ? 1 : 0); });
-        sc.order.forEach(function (s) { out.push("  " + s + " – " + sc.map[s].length); });
-      });
+      var sc = groupBy(rs, function (r) { return r.sku || "(no SKU)"; });
+      sc.order.sort(function (x, y) { return (skuRank(x) - skuRank(y)) || (x < y ? -1 : x > y ? 1 : 0); });
+      sc.order.forEach(function (sk) { out.push("*" + sk + " – " + sc.map[sk].length + "*"); });
       out.push("");
     });
     out.push("🔁 *Multi-Qty Orders*");
@@ -2715,9 +2717,9 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
       v = String(v == null ? "" : v);
       return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
     };
-    var lines = [["Date", "Courier", "AWB", "Order No", "SKU", "Category", "Qty", "Payment", "Amount", "Pincode"].join(",")];
+    var lines = [["Date", "Courier", "AWB", "Order No", "SKU", "Qty", "Payment", "Amount", "Pincode"].join(",")];
     rows.forEach(function (r) {
-      lines.push([fmtDate(r.invoiceDate), r.courier, r.awb, r.orderNo, r.sku, r.category || "", r.qty, r.payment, r.amount, r.pincode].map(esc).join(","));
+      lines.push([fmtDate(r.invoiceDate), r.courier, r.awb, r.orderNo, r.sku, r.qty, r.payment, r.amount, r.pincode].map(esc).join(","));
     });
     return "﻿" + lines.join("\n") + "\n";
   }
@@ -2928,6 +2930,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
 
   async function rebuild() {
     core.recategorize(S.rows);
+    try { if (window.SASku && window.SASku.ensure) await window.SASku.ensure(S.rows.map(function (r) { return r.sku; })); } catch (e) {}
     var d = core.dedupe(S.rows);
     var allRows = d.rows;
     var rows = allRows.filter(function (r) { return !S.removed[r.awb]; });
@@ -3077,9 +3080,6 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
     }
     if (c.removedCount) notes.appendChild(el("div", "note warn", c.removedCount + " label" + (c.removedCount === 1 ? " was" : "s were") + " left out as possible fraud. They are not in the PDFs, the summary or your saved orders."));
     if (c.dups.length) notes.appendChild(el("div", "note warn", c.dups.length + " repeated label" + (c.dups.length === 1 ? " was" : "s were") + " ignored because the same AWB appeared twice in these PDFs."));
-    var uncat = {};
-    c.rows.forEach(function (r) { if (!r.category) uncat[r.sku || "(no SKU)"] = 1; });
-    if (Object.keys(uncat).length) notes.appendChild(el("div", "note warn", "Not in your SKU list (shown as Other, last in the summary and PDFs): " + Object.keys(uncat).join(", ") + ". Add them under Settings, Manage SKUs."));
     if (c.skippedPages) notes.appendChild(el("div", "note info", c.skippedPages + " page" + (c.skippedPages === 1 ? "" : "s") + " without a label were skipped."));
 
     $("summary").textContent = core.buildSummary(c.rows, c.dateStr);
@@ -3339,7 +3339,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
       return { cats: cats, map: map, has: cats.length > 0 };
     });
   }
-  function catOf(o, st) { return st.has ? (st.map[key(o.sku)] || "Other") : (o.category || "Other"); }
+  function catOf(o, st) { return o.sku || "(no SKU)"; }
 
   /* ---------------------------------------------------------------- actions */
   var A = {};
@@ -3347,6 +3347,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
   A.ping = function () { return kvGet("lastBackup").then(function (b) { return { ok: true, lastBackup: b || null }; }); };
 
   A.add = function (p) {
+    try { A.sku_add({ skus: (p.rows || []).map(function (r) { return r.sku; }) }); } catch (e) {}
     return orders().then(function (list) {
       var seen = {}, fresh = [], skipped = 0, invalid = 0;
       list.forEach(function (o) { seen[o.k] = 1; });
@@ -3453,7 +3454,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
         return false;
       }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : b.addedAt - a.addedAt; });
       return { ok: true, total: hits.length, results: hits.slice(0, 20).map(function (o) {
-        return { orderNo: o.orderNo, date: o.date, courier: o.courier, awb: o.awb, orderDate: o.orderDate, sku: o.sku, category: v[1].has ? (v[1].map[key(o.sku)] || "Other") : (o.category || ""),
+        return { orderNo: o.orderNo, date: o.date, courier: o.courier, awb: o.awb, orderDate: o.orderDate, sku: o.sku, category: o.sku || "",
           qty: o.qty, payment: o.payment, value: o.amount, name: o.name, address: o.address, pincode: o.pincode, archived: false };
       }) };
     });
@@ -3479,17 +3480,22 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
   };
   A.fraud_list = function () { return getAll("frauds").then(function (l) { return { ok: true, frauds: l }; }); };
 
-  A.sku_get = function () { return kvGet("sku").then(function (c) { return { ok: true, exists: !!(c && c.length), categories: c || [] }; }); };
-  A.sku_save = function (p) { return kvSet("sku", p.categories || []).then(function () { return { ok: true }; }); };
+  function flat(c) { var out = [], seen = {}; (c || []).forEach(function (x) { var arr = typeof x === "string" ? [x] : ((x.skus && x.skus.length) ? x.skus : (x.name ? [x.name] : [])); arr.forEach(function (n) { var k = key(n); if (k && !seen[k]) { seen[k] = 1; out.push(String(n).replace(/\s+/g, " ").trim()); } }); }); return out; }
+  A.sku_get = function () { return kvGet("sku").then(function (c) { var l = flat(c); return { ok: true, exists: l.length > 0, skus: l, categories: l.map(function (n) { return { name: n, skus: [n] }; }) }; }); };
+  A.sku_add = function (p) {
+    return kvGet("sku").then(function (c) {
+      var l = flat(c), seen = {}; l.forEach(function (n) { seen[key(n)] = 1; }); var added = 0;
+      (p.skus || []).forEach(function (n) { var k = key(n); if (k && !seen[k]) { seen[k] = 1; l.push(String(n).replace(/\s+/g, " ").trim()); added++; } });
+      return (added ? kvSet("sku", l) : Promise.resolve()).then(function () { return { ok: true, added: added, skus: l }; });
+    });
+  };
+  A.sku_save = function (p) { return kvSet("sku", flat(p.skus || p.categories || [])).then(function () { return { ok: true }; }); };
   A.sku_seed = function () {
     return orders().then(function (list) {
-      var by = {}, seen = {};
-      list.forEach(function (o) {
-        if (!o.sku || seen[key(o.sku)]) return;
-        seen[key(o.sku)] = 1;
-        var c = o.category || "New SKUs"; (by[c] = by[c] || []).push(o.sku);
-      });
-      return { ok: true, categories: Object.keys(by).map(function (c) { return { name: c, skus: by[c].sort() }; }) };
+      var seen = {}, out = [];
+      list.forEach(function (o) { if (!o.sku || seen[key(o.sku)]) return; seen[key(o.sku)] = 1; out.push(o.sku); });
+      out.sort();
+      return { ok: true, skus: out, categories: out.map(function (n) { return { name: n, skus: [n] }; }) };
     });
   };
 
@@ -4086,7 +4092,7 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
     profit: { name: "Settlements", sub: "Monthly payments", go: "profit", ic: G('<path d="M6 4h12M6 9h12M6 4c6 0 8 2 8 5s-3 5-8 5l8 6"/>') },
     fraud: { name: "Report fraud", sub: "Add and check customers", go: "fraud", ic: G('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>') },
     search: { name: "Search", sub: "Order, AWB, customer", go: "search", ic: G('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/>') },
-    skus: { name: "Manage SKUs", sub: "Categories and order", go: "skus", ic: G('<path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/>') }
+    skus: { name: "Manage SKUs", sub: "Your SKUs and their order", go: "skus", ic: G('<path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/>') }
   };
   var HOME_DEF = { tiles: ["labels", "dash", "profit", "fraud"], today: { couriers: true, value: true, week: true, bars: true } };
   function getHome() {
@@ -4294,48 +4300,41 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
   function clean(s) { return String(s || "").replace(/\s+/g, " ").trim(); }
 
   /* ------------------------------------------------ the list used for grouping */
-  function apply(cats) {
-    core.setSkuConfig(cats && cats.length ? cats : null);
-    lsSet(LS, cats && cats.length ? JSON.stringify(cats) : "");
+  function toNames(c) { var out = []; (c || []).forEach(function (x) { if (typeof x === "string") out.push(x); else if (x && x.skus && x.skus.length) out = out.concat(x.skus); else if (x && x.name) out.push(x.name); }); return out; }
+  function apply(list) {
+    list = toNames(list);
+    core.setSkuConfig(list.length ? list : null);
+    lsSet(LS, list.length ? JSON.stringify(list) : "");
   }
-  try { var c0 = JSON.parse(lsGet(LS) || "null"); if (c0 && c0.length) core.setSkuConfig(c0); } catch (e) {}
+  try { var c0 = JSON.parse(lsGet(LS) || "null"); if (c0 && c0.length) core.setSkuConfig(toNames(c0)); } catch (e) {}
 
-  // asks the sheet for the current list; keeps the saved copy when the sheet cannot be reached
+  var model = [], exists = false, status = { text: "", bad: false };
   function refresh() {
-    if (!SH.connected()) return Promise.resolve(false);
-    var t = new Promise(function (res) { setTimeout(function () { res("timeout"); }, 6000); });
-    return Promise.race([SH.call("sku_get"), t]).then(function (r) {
-      if (r === "timeout") return false;
-      apply(r.categories || []);
-      return true;
-    }).catch(function () { return false; });
+    return SH.call("sku_get").then(function (r) { model = r.skus || []; apply(model); return true; }).catch(function () { return false; });
   }
-  window.SASku = { refresh: refresh };
+  // SKUs read from labels are added to the end of the list (the existing order is never changed)
+  function ensure(skus) {
+    var seen = {}, fresh = [];
+    skus.forEach(function (x) { var k = key(x); if (k && !seen[k]) { seen[k] = 1; fresh.push(clean(x)); } });
+    if (!fresh.length) return Promise.resolve(0);
+    return SH.call("sku_add", { skus: fresh }).then(function (r) { model = r.skus || model; apply(model); return r.added || 0; });
+  }
+  window.SASku = { refresh: refresh, ensure: ensure };
   refresh();
 
   /* ------------------------------------------------------------- Manage SKUs */
   var body = $("sku-body");
-  var model = [], exists = false, loaded = false, status = { text: "", bad: false }, open = -1, dirty = false;
-
   function setStatus(text, bad) { status = { text: text, bad: !!bad }; var n = $("sku-status"); if (n) { n.textContent = text; n.className = "msg" + (bad ? " bad" : ""); } }
-
   function save() {
-    dirty = true;
     setStatus("Saving …");
-    return SH.call("sku_save", { categories: model }).then(function (r) {
-      dirty = false; exists = true; apply(model);
-      if (r && r.summaryError) setStatus("Saved, but " + r.summaryError.charAt(0).toLowerCase() + r.summaryError.slice(1), true); else setStatus("Saved on this phone.");
-    }).catch(function (e) { setStatus(e.message + " The change is on this screen only. Tap Retry.", true); var r = $("sku-retry"); if (r) r.hidden = false; });
+    return SH.call("sku_save", { skus: model }).then(function () { apply(model); setStatus("Saved on this phone."); })
+      .catch(function (e) { setStatus(e.message + " The change is on this screen only.", true); });
   }
-
   function load() {
-    body.textContent = "";
-    if (!SH.connected()) { body.appendChild(head()); body.appendChild(el("div", "note info", "Connect your sheet first (Sheet settings), then come back here.")); return; }
-    body.appendChild(head()); body.appendChild(el("p", "msg", "Loading your list …"));
-    SH.call("sku_get").then(function (r) { model = r.categories || []; exists = !!r.exists && model.length > 0; loaded = true; open = -1; render(); })
-      .catch(function (e) { body.textContent = ""; body.appendChild(head()); var m = el("p", "msg bad", e.message); body.appendChild(m); });
+    body.textContent = ""; body.appendChild(head()); body.appendChild(el("p", "msg", "Loading your list …"));
+    SH.call("sku_get").then(function (r) { model = r.skus || []; render(); })
+      .catch(function (e) { body.textContent = ""; body.appendChild(head()); body.appendChild(el("p", "msg bad", e.message)); });
   }
-
   function head() {
     var row = el("div", "row");
     row.appendChild(el("h2", "", "Manage SKUs"));
@@ -4344,135 +4343,62 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
     row.appendChild(back);
     return row;
   }
-
   function ib(text, label, fn, disabled) {
     var b = el("button", "btn ghost sm", text); b.type = "button"; b.setAttribute("aria-label", label); b.disabled = !!disabled;
     b.addEventListener("click", fn); return b;
   }
   function move(arr, i, d) { var j = i + d; if (j < 0 || j >= arr.length) return; var t = arr[i]; arr[i] = arr[j]; arr[j] = t; }
-  function skuOwner(name) { for (var i = 0; i < model.length; i++) { if (model[i].skus.some(function (s) { return key(s) === key(name); })) return model[i].name; } return ""; }
-  function catExists(name, except) { return model.some(function (c, i) { return i !== except && key(c.name) === key(name); }); }
-
-  function statusBlock() {
-    var box = el("div", "stack"); box.style.gap = "6px";
-    var s = el("p", "msg" + (status.bad ? " bad" : ""), status.text); s.id = "sku-status"; s.setAttribute("role", "status"); box.appendChild(s);
-    var r = ib("Retry", "Retry saving", function () { r.hidden = true; save(); }); r.id = "sku-retry"; r.hidden = !status.bad; box.appendChild(r);
-    return box;
-  }
+  function has(name, except) { return model.some(function (c, i) { return i !== except && key(c) === key(name); }); }
 
   function render() {
-    body.textContent = "";
-    body.appendChild(head());
-    if (!exists) {
-      var card = el("section", "card");
-      card.appendChild(el("p", "help", "You have not made a SKU list yet, so every SKU shows as Other. Start an empty list and add your categories and SKUs, or fill it from the orders you have already saved."));
-      var go = el("button", "btn ghost", "Fill my list from my saved orders"); go.type = "button";
-      var msg = el("p", "msg", ""); msg.id = "sku-seed-msg";
+    body.textContent = ""; body.appendChild(head());
+    body.appendChild(el("p", "help", "Your SKUs are added here by themselves when you upload labels. The order here is the order of the courier PDFs, the WhatsApp list and the Dashboard. Use the arrows to move a SKU. Changes save on this phone automatically."));
+    var s = el("p", "msg" + (status.bad ? " bad" : ""), status.text); s.id = "sku-status"; s.setAttribute("role", "status"); body.appendChild(s);
+    var card = el("section", "card");
+    card.appendChild(el("h2", "", model.length + (model.length === 1 ? " SKU" : " SKUs")));
+    if (!model.length) {
+      card.appendChild(el("p", "muted", "No SKUs yet. Upload your label PDFs on the Labels page and they appear here. You can also add one by hand below, or fill the list from your saved orders."));
+      var go = el("button", "btn ghost", "Fill from my saved orders"); go.type = "button";
       go.addEventListener("click", function () {
-        go.disabled = true; msg.textContent = "Reading your orders …"; msg.className = "msg";
-        SH.call("sku_seed").then(function (r) {
-          if (!r.categories || !r.categories.length) { msg.textContent = "No saved orders yet. Use Start an empty list and add your SKUs yourself."; msg.className = "msg bad"; go.disabled = false; return; }
-          model = r.categories; return save().then(function () { exists = !dirty; render(); });
-        }).catch(function (e) { msg.textContent = e.message; msg.className = "msg bad"; go.disabled = false; });
+        SH.call("sku_seed").then(function (r) { if (!r.skus || !r.skus.length) { setStatus("No saved orders yet.", true); return; } model = r.skus; render(); save(); });
       });
-      var st0 = el("button", "btn", "Start an empty list"); st0.type = "button";
-      st0.addEventListener("click", function () { model = []; exists = true; dirty = false; render(); });
-      card.appendChild(st0); card.appendChild(go); card.appendChild(msg); body.appendChild(card); return;
+      card.appendChild(go);
     }
-    body.appendChild(el("p", "help", "These are your categories and SKUs, in the order used for the WhatsApp pick list, the courier PDFs and the Dashboard. Changes save on this phone automatically. A SKU that is not in this list shows as Other."));
-    body.appendChild(statusBlock());
-    if (open >= 0 && model[open]) renderCategory(open); else renderCategories();
-  }
-
-  function addRow(placeholder, button, onAdd) {
+    var tw = el("div", "tablewrap"); var tb = document.createElement("table");
+    var thead = document.createElement("thead"), hr = document.createElement("tr");
+    ["#", "SKU", "Move", ""].forEach(function (h) { hr.appendChild(el("th", "", h)); });
+    thead.appendChild(hr); tb.appendChild(thead);
+    var tbody = document.createElement("tbody");
+    model.forEach(function (sk, i) {
+      var tr = document.createElement("tr");
+      tr.appendChild(el("td", "", String(i + 1)));
+      tr.appendChild(el("td", "sku-name", sk));
+      var mv = el("td", ""); mv.style.whiteSpace = "nowrap";
+      mv.appendChild(ib("↑", "Move " + sk + " up", function () { move(model, i, -1); render(); save(); }, i === 0));
+      mv.appendChild(ib("↓", "Move " + sk + " down", function () { move(model, i, 1); render(); save(); }, i === model.length - 1));
+      tr.appendChild(mv);
+      var ac = el("td", ""); ac.style.whiteSpace = "nowrap";
+      ac.appendChild(ib("Edit", "Edit " + sk, function () {
+        var v = clean(window.prompt("SKU name exactly as it is on the label", sk));
+        if (!v || v === sk) return;
+        if (has(v, i)) { setStatus(v + " is already in the list.", true); return; }
+        model[i] = v; render(); save();
+      }));
+      ac.appendChild(ib("Delete", "Delete " + sk, function () {
+        if (!window.confirm("Delete SKU \"" + sk + "\"? It comes back at the end of the list the next time a label with it is uploaded.")) return;
+        model.splice(i, 1); render(); save();
+      }));
+      tr.appendChild(ac);
+      tbody.appendChild(tr);
+    });
+    tb.appendChild(tbody); tw.appendChild(tb); card.appendChild(tw);
     var wrap = el("div", "field");
-    var inp = el("input"); inp.type = "text"; inp.placeholder = placeholder; inp.autocomplete = "off"; inp.autocapitalize = "off";
-    var b = el("button", "btn", button); b.type = "button";
-    function go() { var v = clean(inp.value); if (!v) return; if (onAdd(v) !== false) inp.value = ""; }
-    b.addEventListener("click", go);
-    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
-    wrap.appendChild(inp); wrap.appendChild(b); return wrap;
-  }
-
-  function renderCategories() {
-    var card = el("section", "card");
-    card.appendChild(el("h2", "", "Categories"));
-    model.forEach(function (c, i) {
-      var row = el("div", "sku-row");
-      var name = el("button", "sku-open", c.name); name.type = "button";
-      name.addEventListener("click", function () { open = i; render(); });
-      row.appendChild(name);
-      row.appendChild(el("span", "muted", c.skus.length + (c.skus.length === 1 ? " SKU" : " SKUs")));
-      row.appendChild(ib("↑", "Move " + c.name + " up", function () { move(model, i, -1); render(); save(); }, i === 0));
-      row.appendChild(ib("↓", "Move " + c.name + " down", function () { move(model, i, 1); render(); save(); }, i === model.length - 1));
-      card.appendChild(row);
-    });
-    var other = el("div", "sku-row"); other.appendChild(el("span", "muted", "Other: SKUs not in your list. Always last."));
-    card.appendChild(other);
-    card.appendChild(addRow("New category name", "Add category", function (v) {
-      if (key(v) === "other") { setStatus("\"Other\" is kept for SKUs that are not in your list.", true); return false; }
-      if (catExists(v, -1)) { setStatus("You already have a category called " + v + ".", true); return false; }
-      model.push({ name: v, skus: [] }); open = model.length - 1; render(); save();
-    }));
-    body.appendChild(card);
-    body.appendChild(el("p", "muted", "The Dashboard follows this list by itself. Renaming a category renames it for all your saved orders too."));
-  }
-
-  function renderCategory(i) {
-    var c = model[i];
-    var bar = el("div", "row");
-    var back = ib("← Categories", "Back to categories", function () { open = -1; render(); }); bar.appendChild(back);
-    body.appendChild(bar);
-    var card = el("section", "card");
-    var h = el("div", "row"); h.appendChild(el("h2", "", c.name));
-    var tools = el("div", "row"); tools.style.gap = "8px";
-    tools.appendChild(ib("Rename", "Rename category", function () {
-      var v = clean(window.prompt("Category name", c.name));
-      if (!v || v === c.name) return;
-      if (key(v) === "other") { setStatus("\"Other\" is kept for SKUs that are not in your list.", true); return; }
-      if (catExists(v, i)) { setStatus("You already have a category called " + v + ".", true); return; }
-      c.name = v; render(); save();
-    }));
-    tools.appendChild(ib("Delete category", "Delete category", function () {
-      var msg = c.skus.length ? "Delete \"" + c.name + "\"? Its " + c.skus.length + " SKUs will go to Other until you add them again." : "Delete \"" + c.name + "\"?";
-      if (!window.confirm(msg)) return;
-      model.splice(i, 1); open = -1; render(); save();
-    }));
-    h.appendChild(tools); card.appendChild(h);
-    if (!c.skus.length) card.appendChild(el("p", "muted", "No SKUs in this category yet."));
-    c.skus.forEach(function (s, si) {
-      var item = el("div", "sku-item");
-      item.appendChild(el("div", "sku-name", s));
-      var acts = el("div", "row"); acts.style.gap = "6px"; acts.style.justifyContent = "flex-start";
-      acts.appendChild(ib("↑", "Move " + s + " up", function () { move(c.skus, si, -1); render(); save(); }, si === 0));
-      acts.appendChild(ib("↓", "Move " + s + " down", function () { move(c.skus, si, 1); render(); save(); }, si === c.skus.length - 1));
-      acts.appendChild(ib("Edit", "Edit " + s, function () {
-        var v = clean(window.prompt("SKU name exactly as it is on the label", s));
-        if (!v || v === s) return;
-        var own = skuOwner(v);
-        if (own && key(v) !== key(s)) { setStatus(v + " is already in " + own + ".", true); return; }
-        c.skus[si] = v; render(); save();
-      }));
-      var sel = el("select"); sel.setAttribute("aria-label", "Move " + s + " to another category");
-      sel.appendChild(el("option", "", "Move to …")); sel.firstChild.value = "";
-      model.forEach(function (o, oi) { if (oi !== i) { var op = el("option", "", o.name); op.value = String(oi); sel.appendChild(op); } });
-      sel.addEventListener("change", function () {
-        if (sel.value === "") return;
-        var to = model[+sel.value]; c.skus.splice(si, 1); to.skus.push(s); render(); save();
-      });
-      acts.appendChild(sel);
-      acts.appendChild(ib("Delete", "Delete " + s, function () {
-        if (!window.confirm("Delete SKU \"" + s + "\"? It will show as Other on new labels until you add it again.")) return;
-        c.skus.splice(si, 1); render(); save();
-      }));
-      item.appendChild(acts);
-      card.appendChild(item);
-    });
-    card.appendChild(addRow("New SKU, exactly as on the label", "Add SKU", function (v) {
-      var own = skuOwner(v);
-      if (own) { setStatus(v + " is already in " + own + ".", true); return false; }
-      c.skus.push(v); render(); save();
-    }));
+    var inp = el("input"); inp.type = "text"; inp.placeholder = "Add a SKU by hand, exactly as on the label"; inp.autocomplete = "off"; inp.autocapitalize = "off";
+    var ab = el("button", "btn", "Add SKU"); ab.type = "button";
+    function add() { var v = clean(inp.value); if (!v) return; if (has(v, -1)) { setStatus(v + " is already in the list.", true); return; } model.push(v); render(); save(); }
+    ab.addEventListener("click", add);
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); add(); } });
+    wrap.appendChild(inp); wrap.appendChild(ab); card.appendChild(wrap);
     body.appendChild(card);
   }
 
@@ -4975,7 +4901,6 @@ summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; al
     line(c, "AWB", o.awb, true);
     line(c, "Order date", o.orderDate ? dmy(o.orderDate) : "");
     line(c, "SKU", o.sku);
-    line(c, "Category", o.category);
     line(c, "Quantity", String(o.qty));
     line(c, "Payment", (o.payment || "-") + " · ₹" + inr.format(o.value));
     line(c, "Customer", o.name);
@@ -5388,9 +5313,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
     else box.appendChild(el("p", "help", "Not saved for this month yet. Calculate this month again and save it to see this table."));
     var cats = history.categories[m.month] || [];
     if (cats.length) {
-      box.appendChild(el("h3", "pf-h3", "Profit by category (before ads)"));
+      box.appendChild(el("h3", "pf-h3", "Profit by SKU (before ads)"));
       var w = el("div", "tablewrap"), t = el("table"), th = el("thead"), hr = el("tr");
-      ["Category", "Settlement", "Profit", "Profit %"].forEach(function (h, i) { hr.appendChild(el("th", i ? "n" : "", h)); });
+      ["SKU", "Settlement", "Profit", "Profit %"].forEach(function (h, i) { hr.appendChild(el("th", i ? "n" : "", h)); });
       th.appendChild(hr); t.appendChild(th); var tb = el("tbody");
       cats.forEach(function (g) {
         var tr = el("tr"); tr.appendChild(el("td", "", g.category)); tr.appendChild(el("td", "n pf-s", money(g.settlement)));
@@ -5497,7 +5422,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
       ms.forEach(function (m) { var o = el("option", "", monthName(m) + " (" + int.format(p.months[m]) + " lines)"); o.value = m; if (m === main) o.selected = true; sel.appendChild(o); });
       msg("pf-msg", "ok", "Read " + int.format(p.lines.length) + " order lines and " + p.adsRows + " ad deductions (" + money(p.adsTotal) + ").");
       $("pf-s2").hidden = false; $("pf-s3").hidden = false;
-      var pk = lsGet(LS_PACK); $("pf-pack").value = "";
+      var pk = lsGet(LS_PACK); $("pf-pack").value = ""; $("pf-fixed").value = "";
       $("pf-pack-note").textContent = pk != null ? "Last time you used ₹" + pk + " per packet. Enter this month's figure." : "";
       current = {}; catCost = {};
       onMonth();
@@ -5562,7 +5487,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
     var m = $("pf-month").value, host = $("pf-skus"); host.textContent = "";
     var haveHistory = Object.keys(history.costs).length || Object.keys(lsGet(LS_COSTS) || {}).length;
     var g = groupsForMonth();
-    if (!skuList.length) host.appendChild(el("div", "note info", "You have not made a SKU list yet, so every SKU is priced on its own. Settings, Manage SKUs lets you price a whole category at once."));
+    if (!skuList.length) host.appendChild(el("div", "note info", "Each SKU needs its own price."));
     g.cats.forEach(function (c) {
       var pv = prevCatCost(c.list, m), sv = savedCatCost(c.list, m);
       if (!pv && sv !== null) pv = { cost: sv, month: "" };
@@ -5580,9 +5505,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
   }
 
   function missing() { var c = costsForMonth(); return Object.keys(c).filter(function (k) { return !(c[k] >= 0); }); }
+  function fixedOk() { var v = $("pf-fixed").value.trim().replace(/,/g, ""); return v === "" || (isFinite(parseFloat(v)) && parseFloat(v) >= 0); }
   function packOk() { var v = $("pf-pack").value.trim(); return v !== "" && isFinite(parseFloat(v)) && parseFloat(v) >= 0; }
   function refresh() {
-    var miss = missing(), ok = packOk();
+    var miss = missing(), ok = packOk() && fixedOk();
     $("pf-calc").disabled = !!miss.length || !ok;
     $("pf-hint").textContent = !ok ? "Enter the packing cost first." : miss.length ? "A price is still needed for " + miss.length + " SKU" + (miss.length > 1 ? "s" : "") + "." : "";
   }
@@ -5604,6 +5530,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
   $("pf-calc").addEventListener("click", function () {
     var month = $("pf-month").value, packing = parseFloat($("pf-pack").value), costs = {};
     costs = costsForMonth();
+    window.SAProfitOpts.fixed = parseFloat($("pf-fixed").value.trim().replace(/,/g, "")) || 0;
     var r;
     try { r = P.calculate({ lines: parsed.lines, adsTotal: parsed.adsTotal, adsRows: parsed.adsRows, months: parsed.months, month: month, costs: costs, packing: packing, options: window.SAProfitOpts ? window.SAProfitOpts.get() : {} }); }
     catch (e) { msg("pf-s3msg", "bad", e.message || String(e)); return; }
@@ -5653,7 +5580,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
     var tot = el("tr", "total"); tot.appendChild(el("td", "", "Total before ads")); tot.appendChild(el("td", "n", int.format(r.lines))); tot.appendChild(el("td", "n pf-s", money(r.settlement))); tot.appendChild(el("td", "n pf-s", money(r.lineProfit))); tt.appendChild(tot);
     var ct = $("pf-cats").tBodies[0]; ct.textContent = "";
     var cl = categoryRows(r);
-    $("pf-cats-note").textContent = skuList.length ? "Before ads. Profit % is the category's profit divided by its Meesho settlement. Share is each category's part of the profit made by the profitable categories. SKUs that are not in your SKU list are counted as Other." : "Make your SKU list in Settings, Manage SKUs to see profit by category. Until then everything shows as Other.";
+    $("pf-cats-note").textContent = skuList.length ? "Before ads. Profit % is the SKU's profit divided by its Meesho settlement. Share is each SKU's part of the profit made by the profitable categories. SKUs that are not in your SKU list are counted as Other." : "Make your SKU list in Settings, Manage SKUs to see profit by category. Until then everything shows as Other.";
     var bestIdx = -1; cl.forEach(function (g, i) { if (bestIdx < 0 && g.category !== "Other" && g.profit > 0) bestIdx = i; });
     cl.forEach(function (g, i) {
       var tr = el("tr"); var nm = el("td", "", g.category); if (i === bestIdx) nm.appendChild(el("small", "pf-best", " Best"));
@@ -5688,7 +5615,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
     });
     out.push([r.month, "Total before ads", "Sum of all lines paid in the month", tl, Math.round(tc * 100) / 100, Math.round(tp * 100) / 100, Math.round(tk * 100) / 100, r.lineProfit]);
     out.push([r.month, "Ads cost", r.options && r.options.ads === false ? "Ads cost is turned off in Settings, Profit rules" : "Ads Cost sheet of the Meesho file, including GST, deducted once (" + r.adsRows + " deductions)", 0, 0, 0, 0, -r.ads]);
-    if (r.fixed) out.push([r.month, "Other expenses", "Monthly expenses entered in Settings, Profit rules, deducted once", 0, 0, 0, 0, -r.fixed]);
+    if (r.fixed) out.push([r.month, "Other expenses", "Other expenses entered for this month, deducted once", 0, 0, 0, 0, -r.fixed]);
     out.push([r.month, "Monthly profit", "Total before ads − ads cost" + (r.fixed ? " − other expenses" : "") + ". Packing " + r.packing + " per packet. Profit is " + (r.profitPct == null ? "-" : pctText(r.profitPct)) + " of the Meesho settlement " + r.settlement, r.lines, 0, 0, 0, r.profit]);
     return out;
   }
@@ -5705,7 +5632,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
     n.textContent = "Saving …"; n.className = "msg";
     var s = { lines: r.lines, settlement: r.settlement, lineProfit: r.lineProfit, ads: r.ads, fixed: r.fixed, profit: r.profit, profitPct: r.profitPct, shippedLines: r.shippedLines, shippedSettlement: r.shippedSettlement, claimsCount: r.claimsCount, claimsAmount: r.claimsAmount };
     SH.call("profit_save", { month: r.month, packing: r.packing, costs: costs, summary: s, bySku: r.bySku, breakdown: breakdownRows(r), lines: lineRows(r), byCategory: categoryRows(r).map(function (g) { return [r.month, g.category, g.lines, g.units, g.settlement, g.profit, g.perUnit, g.share]; }) }).then(function () {
-      n.textContent = "Saved on this phone: the monthly result, prices, profit by category and the step-by-step breakdown."; n.className = "msg";
+      n.textContent = "Saved on this phone: the monthly result, prices, profit by SKU and the step-by-step breakdown."; n.className = "msg";
       history.costs[r.month] = costs;
       history.categories[r.month] = categoryRows(r).map(function (g) { return { category: g.category, profit: g.profit, units: g.units, settlement: g.settlement, perUnit: g.perUnit }; });
       history.months = history.months.filter(function (m) { return m.month !== r.month; }).concat([{ month: r.month, lines: r.lines, settlement: r.settlement, lineProfit: r.lineProfit, ads: r.ads, fixed: r.fixed, profit: r.profit, profitPct: r.profitPct, packing: r.packing }]).sort(function (a, b) { return a.month < b.month ? -1 : 1; });
@@ -5753,6 +5680,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = api; else 
   $("pf-file").addEventListener("change", function (e) { if (e.target.files[0]) onFile(e.target.files[0]); e.target.value = ""; });
   $("pf-month").addEventListener("change", onMonth);
   $("pf-pack").addEventListener("input", refresh);
+  $("pf-fixed").addEventListener("input", refresh);
   var rt = $("pf-rules").tBodies[0];
   function drawRules() {
     rt.textContent = "";
